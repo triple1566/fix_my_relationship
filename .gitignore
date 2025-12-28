@@ -1,0 +1,3 @@
+#Environment variables
+api_gateway/.env
+llm-service/.env

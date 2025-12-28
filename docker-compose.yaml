@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: ./fix_my_relationship_app
+      target: final
+    environment:
+      NODE_ENV: production
+    ports:
+      - "5173:5173"
+    depends_on:
+      api_gateway:
+        condition: service_started
+    networks:
+      - fmrl-net
+
+  api_gateway:
+    build:
+      context: ./api_gateway
+      target: final
+    environment:
+      DEV_PORT: "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      llm_service:
+        condition: service_started
+    networks:
+      - fmrl-net
+
+  llm_service:
+    build:
+      context: ./llm-service
+    ports:
+      - "8000:8000"
+    # Ensure uvicorn runs from the right module path
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    networks:
+      - fmrl-net
+
+networks:
+  fmrl-net:
+    driver: bridge
