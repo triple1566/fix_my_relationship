@@ -5,6 +5,8 @@ services:
       target: final
     environment:
       NODE_ENV: production
+    volumes:
+      - ./fix_my_relationship_app/:/app
     ports:
       - "5173:5173"
     depends_on:
@@ -19,6 +21,8 @@ services:
       target: final
     environment:
       DEV_PORT: "8080"
+    volumes:
+      - ./api_gateway/:/api_gateway
     ports:
       - "8080:8080"
     depends_on:
@@ -30,6 +34,8 @@ services:
   llm_service:
     build:
       context: ./llm-service
+    volumes:
+      - ./llm-service/:/llm_service
     ports:
       - "8000:8000"
     # Ensure uvicorn runs from the right module path
