@@ -1,8 +1,6 @@
-import "./App.css";
-
-function App() {
+function App(): React.ReactNode {
   console.log("Hello world");
-  return <p>Hello world</p>;
+  return <p>Hello guys</p>;
 }
 
 export default App;
