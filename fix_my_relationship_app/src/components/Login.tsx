@@ -17,7 +17,7 @@ const Login = () => {
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Log in and start fixing your dating life
         </CardDescription>
         <CardAction>
           <Button variant="link">Sign Up</Button>
