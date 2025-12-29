@@ -12,9 +12,10 @@ interface props {
 const NavMenu = ({ handleRoute }: props) => {
   const menuItems = [
     { id: "Home", label: "Home" },
-    { id: "Profile", label: "Profile" },
+
     { id: "Session", label: "Session" },
     { id: "Friends", label: "Friends" },
+    { id: "Profile", label: "Profile" },
   ];
 
   return (

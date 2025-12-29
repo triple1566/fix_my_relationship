@@ -1,3 +1,4 @@
+import Home from "./components/Home";
 import Login from "./components/Login";
 import NavMenu from "./components/NavMenu";
 import { useState } from "react";
@@ -9,7 +10,7 @@ function App(): React.ReactNode {
     <div className="w-full h-screen flex flex-col items-center justify-center bg-linear-to-b from-gray-100 to-gray-300">
       <NavMenu handleRoute={handleRouteState} />
       <div className="w-full h-full flex flex-col items-center justify-center gap-6 lg:gap-10">
-        {!isLoggedIn ? (
+        {!isLoggedIn && routeState !== "Home" ? (
           <>
             <h1 className="font-black text-3xl md:text-4xl lg:text-5xl">
               👨‍🔧 Fix My Relationship! 👩‍🔧
@@ -19,10 +20,14 @@ function App(): React.ReactNode {
         ) : (
           <></>
         )}
-        {routeState === "Home" ? <p>Home</p> : <></>}
-        {routeState === "Profile" ? <p>Profile</p> : <></>}
-        {routeState === "Session" ? <p>Session</p> : <></>}
-        {routeState === "Friends" ? <p>Friends</p> : <></>}
+        {routeState === "Home" ? (
+          <Home landingbuttonHandler={handleRouteState} />
+        ) : (
+          <></>
+        )}
+        {isLoggedIn && routeState === "Profile" ? <p>Profile</p> : <></>}
+        {isLoggedIn && routeState === "Session" ? <p>Session</p> : <></>}
+        {isLoggedIn && routeState === "Friends" ? <p>Friends</p> : <></>}
       </div>
     </div>
   );
