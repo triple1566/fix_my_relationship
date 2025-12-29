@@ -12,7 +12,6 @@ interface props {
 const NavMenu = ({ handleRoute }: props) => {
   const menuItems = [
     { id: "Home", label: "Home" },
-
     { id: "Session", label: "Session" },
     { id: "Friends", label: "Friends" },
     { id: "Profile", label: "Profile" },
@@ -23,7 +22,10 @@ const NavMenu = ({ handleRoute }: props) => {
       <NavigationMenu>
         <NavigationMenuList>
           {menuItems.map((item) => (
-            <NavigationMenuItem onClick={() => handleRoute(item.id)}>
+            <NavigationMenuItem
+              onClick={() => handleRoute(item.id)}
+              key={item.id}
+            >
               <NavigationMenuTrigger
                 className="bg-transparent text-gray-950"
                 key={item.id}
