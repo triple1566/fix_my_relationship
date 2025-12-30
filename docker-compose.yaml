@@ -1,4 +1,25 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fmrl-postgres
+    environment:
+      POSTGRES_DB: fixmyrelationship
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpassword
+    ports:
+      - "5431:5432"
+    #Postgres port is forwarded to local 5431
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fmrl-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devuser -d fixmyrelationship"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   app:
     build:
       context: ./fix_my_relationship_app
@@ -10,6 +31,8 @@ services:
     ports:
       - "5173:5173"
     depends_on:
+      postgres:
+        condition: service_healthy
       api_gateway:
         condition: service_started
     networks:
@@ -21,11 +44,18 @@ services:
       target: final
     environment:
       DEV_PORT: "8080"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: devuser
+      DB_PASSWORD: devpassword
+      DB_NAME: fixmyrelationship
     volumes:
       - ./api_gateway/:/api_gateway
     ports:
       - "8080:8080"
     depends_on:
+      postgres:
+        condition: service_healthy
       llm_service:
         condition: service_started
     networks:
@@ -34,12 +64,20 @@ services:
   llm_service:
     build:
       context: ./llm-service
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: devuser
+      DB_PASSWORD: devpassword
+      DB_NAME: fixmyrelationship
     volumes:
       - ./llm-service/:/llm_service
     ports:
       - "8000:8000"
-    # Ensure uvicorn runs from the right module path
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - fmrl-net
 

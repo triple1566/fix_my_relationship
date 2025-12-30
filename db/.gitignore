@@ -1,0 +1,7 @@
+# Ignore all PostgreSQL data
+data/
+
+# But keep these
+!.gitignore
+!init.sql
+!migrations/

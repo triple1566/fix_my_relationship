@@ -1,3 +1,13 @@
 #Environment variables
 api_gateway/.env
 llm-service/.env
+# Database
+db/data/
+db/*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# Keep but ignore sensitive files
+db/.env
+.env
