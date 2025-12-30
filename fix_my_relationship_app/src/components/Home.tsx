@@ -17,7 +17,7 @@ const Home = ({ landingbuttonHandler }: props) => {
       <Button
         variant="outline"
         className="bg-linear-to-b from-red-400 to-red-600 font-semibold text-3xl p-6 text-white hover:scale-105"
-        onClick={() => landingbuttonHandler("Profile")}
+        onClick={() => landingbuttonHandler("Session")}
       >
         Start Translating
       </Button>

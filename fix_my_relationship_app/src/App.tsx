@@ -2,21 +2,35 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import NavMenu from "./components/NavMenu";
 import Footer from "./components/Footer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "./components/axios/api";
 
 function App(): React.ReactNode {
   const [routeState, handleRouteState] = useState("Home");
-  const isLoggedIn = false;
+  const [authStatus, setAuthStatus] = useState(false);
+  useEffect(() => {
+    api
+      .get("/verifyauth")
+      .then(() => {
+        setAuthStatus(true);
+      })
+      .catch(() => {
+        setAuthStatus(false);
+      });
+  }, []);
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-linear-to-b from-gray-100 to-gray-300">
       <NavMenu handleRoute={handleRouteState} />
       <div className="w-full h-screen flex flex-col items-center justify-center gap-6 lg:gap-10 pt-24 pb-12 px-4">
-        {!isLoggedIn && routeState !== "Home" ? (
+        {!authStatus && routeState !== "Home" ? (
           <div className="flex flex-col items-center justify-center gap-6">
             <h1 className="font-black text-3xl md:text-4xl lg:text-4xl text-center">
               👨‍🔧 Fix My Relationship! 👩‍🔧
             </h1>
-            <Login />
+            <Login
+              setRouteState={handleRouteState}
+              setAuthState={setAuthStatus}
+            />
           </div>
         ) : (
           <></>
@@ -26,9 +40,9 @@ function App(): React.ReactNode {
         ) : (
           <></>
         )}
-        {isLoggedIn && routeState === "Profile" ? <p>Profile</p> : <></>}
-        {isLoggedIn && routeState === "Session" ? <p>Session</p> : <></>}
-        {isLoggedIn && routeState === "Friends" ? <p>Friends</p> : <></>}
+        {authStatus && routeState === "Profile" ? <p>Profile</p> : <></>}
+        {authStatus && routeState === "Session" ? <p>Session</p> : <></>}
+        {authStatus && routeState === "Friends" ? <p>Friends</p> : <></>}
       </div>
       <Footer />
     </div>

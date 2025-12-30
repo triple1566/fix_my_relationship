@@ -7,7 +7,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 	"github.com/triple1566/fix_my_relationship/auth"
 )
 
@@ -26,6 +29,7 @@ type loginResponse struct {
 func AssignHandlers(mux *http.ServeMux, db *sql.DB, jwtSecretKey string) {
 	mux.HandleFunc("/", handleRoot)
 	mux.HandleFunc("/login",handleLogin(db,jwtSecretKey))
+	mux.HandleFunc("/verifyauth", handleVerifyAuth)
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -84,11 +88,47 @@ func handleLogin(db *sql.DB, jwtSecretKey string) http.HandlerFunc{
 						log.Println("Error: Jwt token creation failed")
 						http.Error(w,"Error: Jwt token creation failed", http.StatusInternalServerError)
 					} else{
+						http.SetCookie(w, &http.Cookie{
+							Name:     "access_token",
+							Value:    resp.JWTtoken,
+							Path:     "/",
+							HttpOnly: true,
+							//TODO: Enable https for everything in the future
+							Secure:   false, // MUST be true in production (HTTPS)
+							//TODO: Enable SameSiteStrictMode in the future
+							SameSite: http.SameSiteLaxMode,
+							MaxAge:   900, // 15 minutes
+						})
 						w.WriteHeader(http.StatusAccepted)
-						encoder.Encode(resp)
+						encoder.Encode(map[string]string{"status": "OK"})
 					}
 				}
 			}
 		}
 	}
+}
+
+func handleVerifyAuth(w http.ResponseWriter, r *http.Request) {
+	cookie,err := r.Cookie("access_token")
+	if err!=nil {
+		http.Error(w,"Error: Login has expired", http.StatusUnauthorized)
+		return
+	}
+	tokenstr:=cookie.Value
+	claims := &auth.Claims{}
+	_ = godotenv.Load()
+	jwtSecretKey := os.Getenv("JWT_SECRET")
+	token,err:=jwt.ParseWithClaims(tokenstr, claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv(jwtSecretKey)), nil
+	})
+
+	if err!=nil || !token.Valid {
+		http.Error(w,"Need user login",http.StatusUnauthorized)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]any{
+		"user_id": claims.UserID,
+	})
 }

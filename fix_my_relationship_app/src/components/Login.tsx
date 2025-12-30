@@ -10,12 +10,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "./axios/api";
 import { useState } from "react";
 
-const Login = () => {
-  const queryClient = useQueryClient();
+interface Props {
+  setRouteState: (routeState: string) => void;
+  setAuthState: (authState: boolean) => void;
+}
+
+const Login = (props: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -29,20 +33,28 @@ const Login = () => {
     UserPassword: string;
   }
 
-  async function getJwtToken(data: loginInfo) {
+  // Makes a login request to the backend. Gets assigned a cookie including jwt token on success
+  async function requestLogin(data: loginInfo) {
     const res = await api.post("/login", data);
-    return res.data;
+    return res;
   }
 
+  // Asks the server if it is alive
   const serverState = useQuery({
     queryKey: ["ServerState"],
     queryFn: getServerState,
   });
 
-  const jwtToken = useMutation({
-    mutationFn: getJwtToken,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jwt"] });
+  const loginStatus = useMutation({
+    mutationFn: requestLogin,
+    onSuccess: (response) => {
+      if (response.status == 202) {
+        console.log("Login accepted");
+      } else {
+        console.log("Login failed");
+      }
+      props.setRouteState("Profile");
+      props.setAuthState(true);
     },
   });
 
@@ -65,7 +77,6 @@ const Login = () => {
             <h1>
               FOR DEBUGGING! server running is: {serverState.data?.ServerState}
             </h1>
-            <h1>FOR DEBUGGING! jwtToken is: {jwtToken.data?.jwt}</h1>
             <CardDescription>
               Log in and start fixing your dating life
             </CardDescription>
@@ -113,7 +124,7 @@ const Login = () => {
               type="submit"
               className="w-full"
               onClick={() =>
-                jwtToken.mutate({ UserEmail: email, UserPassword: password })
+                loginStatus.mutate({ UserEmail: email, UserPassword: password })
               }
             >
               Login
