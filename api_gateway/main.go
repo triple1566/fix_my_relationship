@@ -6,11 +6,22 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/triple1566/fix_my_relationship/db"
 	"github.com/triple1566/fix_my_relationship/router"
 )
 
-
 func main() {
+	//=====================================================
+	// Establish connection to database
+
+	newDatabase:=db.ConnectDatabase()
+	defer newDatabase.Close()
+	db.Foo(newDatabase)
+
+	//=====================================================
+	// Server startup
+
+
 	// Load environment variables from .env if present
 	_ = godotenv.Load()
 
