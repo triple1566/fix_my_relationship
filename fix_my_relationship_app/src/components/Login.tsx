@@ -10,18 +10,40 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./axios/api";
+import { useState } from "react";
 
 const Login = () => {
+  const queryClient = useQueryClient();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   async function getServerState() {
     const res = await api.get("/");
+    return res.data;
+  }
+
+  interface loginInfo {
+    UserEmail: string;
+    UserPassword: string;
+  }
+
+  async function getJwtToken(data: loginInfo) {
+    const res = await api.post("/login", data);
     return res.data;
   }
 
   const serverState = useQuery({
     queryKey: ["ServerState"],
     queryFn: getServerState,
+  });
+
+  const jwtToken = useMutation({
+    mutationFn: getJwtToken,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jwt"] });
+    },
   });
 
   console.log("Server state is now: " + serverState.data?.ServerState);
@@ -43,6 +65,7 @@ const Login = () => {
             <h1>
               FOR DEBUGGING! server running is: {serverState.data?.ServerState}
             </h1>
+            <h1>FOR DEBUGGING! jwtToken is: {jwtToken.data?.jwt}</h1>
             <CardDescription>
               Log in and start fixing your dating life
             </CardDescription>
@@ -58,7 +81,9 @@ const Login = () => {
                   <Input
                     id="email"
                     type="email"
+                    value={email}
                     placeholder="m@example.com"
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -72,13 +97,25 @@ const Login = () => {
                       Forgot your password?
                     </a>
                   </div>
-                  <Input id="password" type="password" required />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    required
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 </div>
               </div>
             </form>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              onClick={() =>
+                jwtToken.mutate({ UserEmail: email, UserPassword: password })
+              }
+            >
               Login
             </Button>
           </CardFooter>

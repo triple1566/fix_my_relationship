@@ -33,11 +33,11 @@ func ConnectDatabase() (*sql.DB) {
 	return db
 }
 
-func Foo(db *sql.DB) {
+func Foo(db *sql.DB) (bool){
 	exRow, err:=db.Query("select email, username, password_hash from users;")
 	if err!=nil{
 		log.Println("example query failed")
-		return
+		return false
 	}
 	defer exRow.Close()
 
@@ -45,9 +45,16 @@ func Foo(db *sql.DB) {
 
 	// Loop through row and map values into go struct (user)
 	for exRow.Next() {
-		log.Println("first iteration of example row")
+		// Scan for query values and store them
+		// inside our equivalent struct values
 		err:=exRow.Scan(&exUser.Email, &exUser.Username, &exUser.Hash)
 		if err!=nil{log.Println(err)}
 	}
-	log.Println(exUser.Email+exUser.Username+exUser.Hash)
+
+	//for debugging: log.Println(exUser.Email+exUser.Username+exUser.Hash)
+
+	if(exUser.Email=="example1@ex.com" && exUser.Username=="exampleuser1" && exUser.Hash=="examplehash"){
+		return true
+	}
+	return false
 }

@@ -11,21 +11,21 @@ import (
 )
 
 func main() {
-	//=====================================================
-	// Establish connection to database
+	// Establish connection to database================================
 
 	newDatabase:=db.ConnectDatabase()
 	defer newDatabase.Close()
-	db.Foo(newDatabase)
+	if db.Foo(newDatabase) {
+		log.Println("Success: Test query successful")
+	}else {log.Println("Error: Test query failed")}
 
-	//=====================================================
-	// Server startup
-
+	// Server startup========================================
 
 	// Load environment variables from .env if present
 	_ = godotenv.Load()
 
 	// Prefer PORT, fallback to DEV_PORT, then default to 8080
+	jwtSecretKey := os.Getenv("JWT_SECRET")
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = os.Getenv("DEV_PORT")
@@ -35,7 +35,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	router.AssignHandlers(mux)
+	router.AssignHandlers(mux, newDatabase, jwtSecretKey)
 
 	log.Println("Starting server on :" + port)
 	if err := http.ListenAndServe(":"+port, enableCORS(mux)); err != nil {
