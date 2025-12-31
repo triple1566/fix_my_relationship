@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-import endpoint
+from . import endpoint
 
 router = APIRouter()
 
-router.include_router(endpoint.router, prefix="/events", tags=["events"])
+router.include_router(endpoint.router, prefix="/translate", tags=["translate"])
