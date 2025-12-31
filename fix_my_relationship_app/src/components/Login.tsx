@@ -59,6 +59,10 @@ const Login = (props: Props) => {
       console.log("Login failed");
       setloginFailMsg("Check your credentials again!");
     },
+    onError: () => {
+      console.log("Login failed");
+      setloginFailMsg("Check your credentials again!");
+    },
   });
 
   console.log("Server state is now: " + serverState.data?.ServerState);
