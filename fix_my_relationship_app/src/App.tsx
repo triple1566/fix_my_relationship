@@ -1,4 +1,5 @@
 import Home from "./components/Home";
+import Session from "./components/Session";
 import Login from "./components/Login";
 import NavMenu from "./components/NavMenu";
 import Footer from "./components/Footer";
@@ -41,7 +42,7 @@ function App(): React.ReactNode {
           <></>
         )}
         {authStatus && routeState === "Profile" ? <p>Profile</p> : <></>}
-        {authStatus && routeState === "Session" ? <p>Session</p> : <></>}
+        {authStatus && routeState === "Session" ? <Session /> : <></>}
         {authStatus && routeState === "Friends" ? <p>Friends</p> : <></>}
       </div>
       <Footer />

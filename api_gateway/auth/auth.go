@@ -11,6 +11,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+//Creates the jwt token
 func CreateJWT (userID int, secret []byte) (string, error) {
 	claims := Claims{
 		UserID: userID,

@@ -22,6 +22,9 @@ interface Props {
 const Login = (props: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginFailMsg, setloginFailMsg] = useState(
+    "Log in and start fixing your dating life"
+  );
 
   async function getServerState() {
     const res = await api.get("/");
@@ -50,11 +53,11 @@ const Login = (props: Props) => {
     onSuccess: (response) => {
       if (response.status == 202) {
         console.log("Login accepted");
-      } else {
-        console.log("Login failed");
+        props.setRouteState("Profile");
+        props.setAuthState(true);
       }
-      props.setRouteState("Profile");
-      props.setAuthState(true);
+      console.log("Login failed");
+      setloginFailMsg("Check your credentials again!");
     },
   });
 
@@ -77,9 +80,7 @@ const Login = (props: Props) => {
             <h1>
               FOR DEBUGGING! server running is: {serverState.data?.ServerState}
             </h1>
-            <CardDescription>
-              Log in and start fixing your dating life
-            </CardDescription>
+            <CardDescription>{loginFailMsg}</CardDescription>
             <CardAction>
               <Button variant="link">Sign Up</Button>
             </CardAction>
