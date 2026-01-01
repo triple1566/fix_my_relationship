@@ -26,3 +26,5 @@ docker exec fmrl-postgres pg_dump -U devuser fixmyrelationship > backup.sql
 ## Restore database
 
 docker exec -i fmrl-postgres psql -U devuser fixmyrelationship < backup.sql
+
+developer server user/pw: devuser / devpassword
